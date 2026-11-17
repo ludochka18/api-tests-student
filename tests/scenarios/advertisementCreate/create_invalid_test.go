@@ -27,7 +27,7 @@ func TestCreateAdvertisementWithEmptyTitle(t *testing.T) {
 		"Описание тестового объявления",
 		"100",
 		"1",
-		"../../testdata/advertisement.jpg",
+		testPhotoPath,
 		http.StatusBadRequest,
 	)
 
@@ -49,7 +49,7 @@ func TestCreateAdvertisementWithEmptyDescription(t *testing.T) {
 		"",
 		"100",
 		"1",
-		"../../testdata/advertisement.jpg",
+		testPhotoPath,
 		http.StatusBadRequest,
 	)
 
@@ -71,12 +71,12 @@ func TestCreateAdvertisementWithNegativePrice(t *testing.T) {
 		"Описание тестового объявления",
 		"-100",
 		"1",
-		"../../testdata/advertisement.jpg",
+		testPhotoPath,
 	)
 
 	t.Logf("Результат: статус %d, сообщение: %s", status, apiError.Message)
 	require.Equal(t, http.StatusBadRequest, status, "При отрицательной цене ожидался статус 400")
-	require.NotEmpty(t, apiError.Message, "При отрицательной цене сервер вернул неожиданное сообщение")
+	require.Equal(t, "price must be between 0 and 1000000 inclusive", apiError.Message, "При отрицательной цене сервер вернул неожиданное сообщение")
 }
 
 func TestCreateAdvertisementWithLongTitle(t *testing.T) {
@@ -94,12 +94,12 @@ func TestCreateAdvertisementWithLongTitle(t *testing.T) {
 		"Описание тестового объявления",
 		"100",
 		"1",
-		"../../testdata/advertisement.jpg",
+		testPhotoPath,
 	)
 
 	t.Logf("Результат: статус %d, сообщение: %s", status, apiError.Message)
 	require.Equal(t, http.StatusBadRequest, status, "При слишком длинном названии ожидался статус 400")
-	require.NotEmpty(t, apiError.Message, "При слишком длинном названии сервер вернул неожиданное сообщение")
+	require.Equal(t, "title must not exceed 50 characters provided 1000", apiError.Message, "При слишком длинном названии сервер вернул неожиданное сообщение")
 }
 func TestCreateAdvertisementWithoutPhoto(t *testing.T) {
 	base.SetupSuite()
@@ -120,5 +120,5 @@ func TestCreateAdvertisementWithoutPhoto(t *testing.T) {
 
 	t.Logf("Результат: статус %d, сообщение: %s", status, apiError.Message)
 	require.Equal(t, http.StatusBadRequest, status, "Без фотографии ожидался статус 400")
-	require.NotEmpty(t, apiError.Message, "При запросе без фотографии сервер вернул неожиданное сообщение")
+	require.Equal(t, "at least 1 photo is required", apiError.Message, "При запросе без фотографии сервер вернул неожиданное сообщение")
 }

@@ -1,9 +1,11 @@
 package myAdvertisement
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -41,8 +43,9 @@ func (s *TestSuite) TearDownSuite() {
 func (s *TestSuite) TestGetMyAdvertisementsPositive() {
 	t := s.T()
 	t.Log("Подготовка: создаём собственное объявление")
+	title := fmt.Sprintf("Мои объявления %d", time.Now().UnixNano())
 	advertisement := advertisements.CreateAdvertisement(
-		t, s.loginData.Token, "Тест моих объявлений",
+		t, s.loginData.Token, title,
 		"Объявление для проверки списка", "100", "1",
 		"../../testdata/advertisement.jpg",
 	)
@@ -52,7 +55,7 @@ func (s *TestSuite) TestGetMyAdvertisementsPositive() {
 		advertisements.DeleteAdvertisement(t, s.loginData.Token, advertisement.ID)
 	})
 	t.Log("Шаг: получаем список собственных объявлений")
-	body := myAdvertisements.GetMyAdvertisements(t, s.loginData.Token, http.StatusOK, 50)
+	body := myAdvertisements.GetMyAdvertisements(t, s.loginData.Token, http.StatusOK, 50, title)
 	items := gjson.Get(body, "items").Array()
 	t.Log("Проверка: находим созданное объявление по ID")
 	found := false
@@ -73,7 +76,7 @@ func (s *TestSuite) TestGetMyAdvertisementsPositive() {
 func (s *TestSuite) TestGetMyAdvertisementsIncorrectToken() {
 	var advertisementsBody string
 	s.Run("Получаем список собственных объявлений с неправильным авторизационным токеном", func() {
-		advertisementsBody = myAdvertisements.GetMyAdvertisements(s.T(), "incorrect_token", http.StatusUnauthorized, 50)
+		advertisementsBody = myAdvertisements.GetMyAdvertisements(s.T(), "incorrect_token", http.StatusUnauthorized, 50, "")
 	})
 
 	s.Run("Проверяем, что показывается правильная ошибка", func() {

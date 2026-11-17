@@ -27,7 +27,7 @@ func TestCannotAddOwnAdvertisementToFavorites(t *testing.T) {
 		"Объявление для проверки избранного",
 		"100",
 		"1",
-		"../../testdata/advertisement.jpg",
+		testPhotoPath,
 	)
 	require.NotEmpty(t, advertisement.ID, "Сервер не вернул ID объявления")
 

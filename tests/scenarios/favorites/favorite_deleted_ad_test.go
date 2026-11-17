@@ -32,7 +32,7 @@ func TestFavoriteDisappearsAfterAdvertisementDeletion(t *testing.T) {
 		"Объявление для проверки удаления",
 		"100",
 		"1",
-		"../../testdata/advertisement.jpg",
+		testPhotoPath,
 	)
 	require.NotEmpty(t, advertisement.ID, "Сервер не вернул ID объявления")
 

@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"io"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -23,6 +24,7 @@ func Login(t *testing.T, username, password string) models.LoginOkResponse {
 
 	loginRawResponse := auth.HttpPostAuthLogin(t, request)
 	defer loginRawResponse.Body.Close()
+	require.Equal(t, http.StatusOK, loginRawResponse.StatusCode, "Авторизация: ожидался HTTP 200, получен %d", loginRawResponse.StatusCode)
 
 	respArray, errResponse := io.ReadAll(loginRawResponse.Body)
 	require.NoError(t, errResponse)

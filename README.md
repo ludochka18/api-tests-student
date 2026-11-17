@@ -11,9 +11,8 @@
 
 1. Установите любое IDE для разработки: [Jetbrains GoLand](https://www.jetbrains.com/ru-ru/go/) (Платное или по студенческой лицензии), [VS Code](https://code.visualstudio.com/) (бесплатное).
 2. Установите [Git](https://git-scm.com/install/) на компьютер
-3. [Установите](https://go.dev/doc/install) Go версии 1.25.1
-4. [Настройте](https://docs.github.com/ru/authentication/connecting-to-github-with-ssh) доступ к своему Github-аккаунту
-   по SSH-ключу.
+3. [Установите](https://go.dev/doc/install) Go версии 1.25.1 или выше
+4. Убедитесь, что у вас есть доступ к своему GitHub-аккаунту. Для HTTPS SSH-ключ не требуется.
 5. Склонируйте себе репозиторий: `git clone <путь к вашему репозиторию>`
 6. Подтяните необходимые зависимости через команду в корне проекта:
 
@@ -44,7 +43,7 @@ TEST_SECOND_PASSWORD=пароль_второго_аккаунта
 9. Отдельный пакет с тестами можно запустить командой:
 
 ```bash
-  go test -v ./tests/scenarios/myAdvertisement/
+  go test -v ./tests/scenarios/favorites/
 ```
 
 ## Логирование
@@ -60,3 +59,6 @@ TEST_SECOND_PASSWORD=пароль_второго_аккаунта
 ```bash
   golangci-lint run
 ```
+
+Для проверки повторяемости запустите `go test ./... -count=3`. Тесты обращаются к живому TestBoard и требуют доступности сервиса; ответ HTTP 503 означает ошибку сервиса и не является успешной проверкой. При сбое очистки удалите оставшиеся тестовые объявления вручную.
+

@@ -29,7 +29,7 @@ func TestFavoriteWithDeletedAdvertisement(t *testing.T) {
 		"Объявление будет удалено перед проверкой",
 		"100",
 		"1",
-		"../../testdata/advertisement.jpg",
+		testPhotoPath,
 	)
 	require.NotEmpty(t, advertisement.ID, "Сервер не вернул ID объявления")
 

@@ -1,9 +1,11 @@
 package advertisementSearch
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"api-tests-template/internal/assertions"
 	advList "api-tests-template/internal/managers/advertisements"
@@ -16,17 +18,13 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-// Данные для проверки поиска объявления.
-const (
-	existingAdTitle = "оталвтм"
-	searchBeginning = "от"
-	searchMiddle    = "алв"
-	searchEnd       = "втм"
-)
-
 type TestSuite struct {
 	suite.Suite
 	loginData models.LoginOkResponse
+	title     string
+	beginning string
+	middle    string
+	end       string
 }
 
 func TestSuiteRun(t *testing.T) {
@@ -35,12 +33,6 @@ func TestSuiteRun(t *testing.T) {
 
 func (s *TestSuite) SetupSuite() {
 	base.SetupSuite()
-	base.Precondition("Проверяем, что константы поиска заданы")
-
-	require.NotEmpty(s.T(), existingAdTitle, "Задайте название объявления")
-	require.NotEmpty(s.T(), searchBeginning, "Задайте начало названия")
-	require.NotEmpty(s.T(), searchMiddle, "Задайте середину названия")
-	require.NotEmpty(s.T(), searchEnd, "Задайте конец названия")
 
 	s.loginData = auth.Login(
 		s.T(),
@@ -57,11 +49,16 @@ func (s *TestSuite) TearDownSuite() {
 func (s *TestSuite) SetupTest() {
 	t := s.T()
 	t.Log("Подготовка: создаём объявление для теста поиска")
+	unique := fmt.Sprintf("%x", time.Now().UnixNano())
+	s.beginning = "av" + unique
+	s.middle = unique
+	s.end = unique + "by"
+	s.title = s.beginning + "by"
 
 	advertisement := advList.CreateAdvertisement(
 		t,
 		s.loginData.Token,
-		existingAdTitle,
+		s.title,
 		"Объявление для проверки поиска",
 		"100",
 		"1",
@@ -77,14 +74,14 @@ func (s *TestSuite) SetupTest() {
 }
 
 func (s *TestSuite) TestSearchByTitle() {
-	list := advList.GetAdvertisementsList(s.T(), s.loginData.Token, searchMiddle)
+	list := advList.GetAdvertisementsList(s.T(), s.loginData.Token, s.middle)
 
 	s.Run("В ответе есть хотя бы одно объявление", func() {
 		require.NotEmpty(s.T(), list.Items)
 	})
 
 	s.Run("Среди найденных есть наше объявление", func() {
-		assertions.ContainsAdvertisementByTitle(s.T(), list.Items, existingAdTitle)
+		assertions.ContainsAdvertisementByTitle(s.T(), list.Items, s.title)
 	})
 }
 
@@ -93,18 +90,18 @@ func (s *TestSuite) TestSearchByTitle_Substring() {
 		name   string
 		search string
 	}{
-		{"начало", searchBeginning},
-		{"середина", searchMiddle},
-		{"конец", searchEnd},
-		{"нижний регистр", strings.ToLower(searchMiddle)},
-		{"верхний регистр", strings.ToUpper(searchMiddle)},
-		{"смешанный регистр", utils.MixCase(searchMiddle)},
+		{"начало", s.beginning},
+		{"середина", s.middle},
+		{"конец", s.end},
+		{"нижний регистр", strings.ToLower(s.middle)},
+		{"верхний регистр", strings.ToUpper(s.middle)},
+		{"смешанный регистр", utils.MixCase(s.middle)},
 	}
 
 	for _, tc := range cases {
 		s.Run(tc.name, func() {
 			list := advList.GetAdvertisementsList(s.T(), s.loginData.Token, tc.search)
-			assertions.ContainsAdvertisementByTitle(s.T(), list.Items, existingAdTitle)
+			assertions.ContainsAdvertisementByTitle(s.T(), list.Items, s.title)
 		})
 	}
 }

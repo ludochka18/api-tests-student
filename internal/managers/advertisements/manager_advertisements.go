@@ -60,6 +60,7 @@ func DeleteAdvertisement(t *testing.T, token, id string) {
 
 	response := client.HttpDeleteAdvertisement(t, token, id)
 	defer response.Body.Close()
+	require.Equal(t, http.StatusNoContent, response.StatusCode, "Не удалось удалить объявление %s", id)
 }
 
 // GetAdvertisement получает данные объявления по его ID.
@@ -68,6 +69,7 @@ func GetAdvertisement(t *testing.T, id string) models.Advertisement {
 
 	response := client.HttpGetAdvertisement(t, id)
 	defer response.Body.Close()
+	require.Equal(t, http.StatusOK, response.StatusCode, "Не удалось получить объявление %s", id)
 
 	var advertisement models.Advertisement
 	err := json.NewDecoder(response.Body).Decode(&advertisement)
@@ -103,22 +105,10 @@ func CreateAdvertisementExpectingError(
 ) models.ErrorResponse {
 	t.Helper()
 
-	response := client.HttpCreateAdvertisement(
-		t,
-		token,
-		title,
-		description,
-		price,
-		quantity,
-		photoPath,
-		expectedStatus,
+	status, apiError := CreateAdvertisementWithCleanup(
+		t, token, title, description, price, quantity, photoPath,
 	)
-	defer response.Body.Close()
-
-	var apiError models.ErrorResponse
-	err := json.NewDecoder(response.Body).Decode(&apiError)
-	require.NoError(t, err, "Не удалось прочитать ответ с ошибкой")
-
+	require.Equal(t, expectedStatus, status, "Неожиданный статус создания объявления")
 	return apiError
 }
 
@@ -161,7 +151,7 @@ func CreateAdvertisementWithCleanup(
 
 	var apiError models.ErrorResponse
 	err := json.NewDecoder(response.Body).Decode(&apiError)
-	require.NoError(t, err, "Не удалось прочитать ответ с ошибкой")
+	require.NoErrorf(t, err, "Не удалось прочитать ответ с ошибкой (HTTP %d)", response.StatusCode)
 
 	return response.StatusCode, apiError
 }

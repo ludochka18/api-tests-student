@@ -23,7 +23,7 @@ func TestCreateAdvertisementWithoutAuthorization(t *testing.T) {
 		"Описание тестового объявления",
 		"100",
 		"1",
-		"../../testdata/advertisement.jpg",
+		testPhotoPath,
 		http.StatusUnauthorized,
 	)
 
@@ -45,10 +45,10 @@ func TestCreateAdvertisementWithInvalidToken(t *testing.T) {
 		"Описание тестового объявления",
 		"100",
 		"1",
-		"../../testdata/advertisement.jpg",
+		testPhotoPath,
 		http.StatusUnauthorized,
 	)
 
 	t.Log("Проверка: сервер вернул сообщение об ошибке авторизации")
-	require.NotEmpty(t, apiError.Message, "Сервер не вернул сообщение об ошибке")
+	require.Equal(t, "Invalid or expired token", apiError.Message, "При неверном токене сервер вернул неожиданное сообщение")
 }

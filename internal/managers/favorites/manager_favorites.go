@@ -2,6 +2,7 @@ package favorites
 
 import (
 	"encoding/json"
+	"net/http"
 	"testing"
 
 	client "api-tests-template/internal/client/http/favorites"
@@ -18,6 +19,7 @@ func GetFavorites(t *testing.T, token, search string) models.FavoriteList {
 
 	response := client.HttpGetFavorites(t, token, search)
 	defer response.Body.Close()
+	require.Equal(t, http.StatusOK, response.StatusCode, "Не удалось получить избранное")
 
 	var favorites models.FavoriteList
 	err := json.NewDecoder(response.Body).Decode(&favorites)
@@ -32,6 +34,7 @@ func AddFavorite(t *testing.T, token, advertisementID string) models.FavoriteIte
 
 	response := client.HttpAddFavorite(t, token, advertisementID)
 	defer response.Body.Close()
+	require.Equal(t, http.StatusCreated, response.StatusCode, "Не удалось добавить объявление %s в избранное", advertisementID)
 
 	var favorite models.FavoriteItem
 	err := json.NewDecoder(response.Body).Decode(&favorite)
@@ -46,6 +49,7 @@ func DeleteFavorite(t *testing.T, token, advertisementID string) {
 
 	response := client.HttpDeleteFavorite(t, token, advertisementID)
 	defer response.Body.Close()
+	require.Equal(t, http.StatusNoContent, response.StatusCode, "Не удалось удалить объявление %s из избранного", advertisementID)
 }
 
 // AddFavoriteExpectingError возвращает статус и ошибку добавления в избранное.
@@ -61,7 +65,7 @@ func AddFavoriteExpectingError(
 
 	var apiError advertisementModels.ErrorResponse
 	err := json.NewDecoder(response.Body).Decode(&apiError)
-	require.NoError(t, err, "Не удалось прочитать ошибку добавления в избранное")
+	require.NoErrorf(t, err, "Не удалось прочитать ошибку добавления в избранное (HTTP %d)", response.StatusCode)
 
 	return response.StatusCode, apiError
 }
@@ -79,7 +83,7 @@ func DeleteFavoriteExpectingError(
 
 	var apiError advertisementModels.ErrorResponse
 	err := json.NewDecoder(response.Body).Decode(&apiError)
-	require.NoError(t, err, "Не удалось прочитать ошибку удаления из избранного")
+	require.NoErrorf(t, err, "Не удалось прочитать ошибку удаления из избранного (HTTP %d)", response.StatusCode)
 
 	return response.StatusCode, apiError
 }
@@ -91,12 +95,12 @@ func GetFavoritesExpectingError(
 ) (int, advertisementModels.ErrorResponse) {
 	t.Helper()
 
-	response := client.HttpGetFavoritesRaw(t, token)
+	response := client.HttpGetFavoritesRaw(t, token, "")
 	defer response.Body.Close()
 
 	var apiError advertisementModels.ErrorResponse
 	err := json.NewDecoder(response.Body).Decode(&apiError)
-	require.NoError(t, err, "Не удалось прочитать ошибку получения избранного")
+	require.NoErrorf(t, err, "Не удалось прочитать ошибку получения избранного (HTTP %d)", response.StatusCode)
 
 	return response.StatusCode, apiError
 }

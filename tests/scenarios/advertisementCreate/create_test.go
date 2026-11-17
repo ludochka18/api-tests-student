@@ -20,7 +20,7 @@ func TestCreateAdvertisement(t *testing.T) {
 	login := auth.Login(t, os.Getenv("TEST_LOGIN"), os.Getenv("TEST_PASSWORD"))
 
 	title := fmt.Sprintf("Тестовое объявление %d", time.Now().UnixNano())
-	photoPath := "../../testdata/advertisement.jpg"
+	photoPath := testPhotoPath
 
 	t.Log("Шаг: создаём объявление с фотографией")
 	advertisement := advertisements.CreateAdvertisement(

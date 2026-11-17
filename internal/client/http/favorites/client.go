@@ -10,16 +10,11 @@ import (
 // HttpGetFavorites получает список избранного с поиском по названию.
 func HttpGetFavorites(t *testing.T, token, search string) *http.Response {
 	t.Helper()
-
-	return apiRunner.GetRunner().
-		Auth(token).
-		Create().
-		Get("/favorites").
-		Query("search", search).
-		Expect(t).
-		Status(http.StatusOK).
-		End().
-		Response
+	response := HttpGetFavoritesRaw(t, token, search)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("Неожиданный статус получения избранного: ожидали %d, получили %d", http.StatusOK, response.StatusCode)
+	}
+	return response
 }
 
 // HttpAddFavorite добавляет объявление в избранное и проверяет статус ответа.
@@ -88,13 +83,14 @@ func HttpDeleteFavoriteRaw(t *testing.T, token, advertisementID string) *http.Re
 }
 
 // HttpGetFavoritesRaw возвращает ответ списка избранного без проверки статуса.
-func HttpGetFavoritesRaw(t *testing.T, token string) *http.Response {
+func HttpGetFavoritesRaw(t *testing.T, token, search string) *http.Response {
 	t.Helper()
 
 	return apiRunner.GetRunner().
 		Auth(token).
 		Create().
 		Get("/favorites").
+		Query("search", search).
 		Expect(t).
 		End().
 		Response
