@@ -2,8 +2,9 @@ package assertions
 
 import (
 	"api-tests-template/internal/managers/advertisements/models"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // ContainsAdvertisementByTitle проверяет точное название среди результатов.

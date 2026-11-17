@@ -14,6 +14,7 @@ func HttpGetAdvertisements(t *testing.T, token, textForSearch string) *http.Resp
 }
 
 // HttpCreateAdvertisement отправляет запрос на создание объявления с фотографией.
+// HttpCreateAdvertisement создаёт объявление и проверяет статус ответа.
 func HttpCreateAdvertisement(
 	t *testing.T,
 	token string,
@@ -26,19 +27,25 @@ func HttpCreateAdvertisement(
 ) *http.Response {
 	t.Helper()
 
-	return apiRunner.GetRunner().
-		Auth(token).
-		Create().
-		Post("/advertisement").
-		MultipartFormData("title", title). // MultipartFormData - добавляет текстовое поле в запрос
-		MultipartFormData("description", description).
-		MultipartFormData("price", price).
-		MultipartFormData("quantity", quantity).
-		MultipartFile("photos", photoPath).
-		Expect(t).
-		Status(expectedStatus).
-		End().
-		Response
+	response := HttpCreateAdvertisementWithoutStatusCheck(
+		t,
+		token,
+		title,
+		description,
+		price,
+		quantity,
+		photoPath,
+	)
+
+	if response.StatusCode != expectedStatus {
+		t.Errorf(
+			"Неожиданный статус создания объявления: ожидали %d, получили %d",
+			expectedStatus,
+			response.StatusCode,
+		)
+	}
+
+	return response
 }
 
 // HttpDeleteAdvertisement удаляет объявление по его ID.
