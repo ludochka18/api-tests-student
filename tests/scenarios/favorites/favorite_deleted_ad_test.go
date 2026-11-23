@@ -45,7 +45,12 @@ func TestFavoriteDisappearsAfterAdvertisementDeletion(t *testing.T) {
 	t.Log("Проверка: объявление появилось в избранном")
 	list := favorites.GetFavorites(t, user.Token, title)
 	require.Len(t, list.Items, 1, "Объявление не найдено в избранном")
-	require.Equal(t, advertisement.ID, list.Items[0].Advertisement.ID)
+	require.Equal(
+		t,
+		advertisement.ID,
+		list.Items[0].Advertisement.ID,
+		"ID объявления в избранном не совпадает с ID созданного объявления",
+	)
 
 	t.Log("Шаг: владелец удаляет объявление")
 	advertisements.DeleteAdvertisement(t, owner.Token, advertisement.ID)

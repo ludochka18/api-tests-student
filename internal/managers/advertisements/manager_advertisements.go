@@ -17,9 +17,9 @@ func GetAdvertisementsList(t *testing.T, token, text string) models.Advertisemen
 	raw := client.HttpGetAdvertisements(t, token, text)
 	defer raw.Body.Close()
 	body, err := io.ReadAll(raw.Body)
-	require.NoError(t, err)
+	require.NoError(t, err, "Не удалось прочитать ответ поиска объявлений")
 	var result models.AdvertisementsList
-	require.NoError(t, json.Unmarshal(body, &result))
+	require.NoError(t, json.Unmarshal(body, &result), "Не удалось разобрать JSON ответа поиска объявлений")
 	return result
 }
 
