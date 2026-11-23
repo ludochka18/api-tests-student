@@ -100,6 +100,7 @@ func HttpCreateAdvertisementWithoutStatusCheck(
 	price string,
 	quantity string,
 	photoPath string,
+	extraPhotoPaths ...string,
 ) *http.Response {
 	t.Helper()
 
@@ -113,7 +114,8 @@ func HttpCreateAdvertisementWithoutStatusCheck(
 		MultipartFormData("quantity", quantity)
 
 	if photoPath != "" {
-		request.MultipartFile("photos", photoPath)
+		photoPaths := append([]string{photoPath}, extraPhotoPaths...)
+		request.MultipartFile("photos", photoPaths...)
 	}
 
 	return request.

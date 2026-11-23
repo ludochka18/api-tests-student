@@ -122,3 +122,60 @@ func TestCreateAdvertisementWithoutPhoto(t *testing.T) {
 	require.Equal(t, http.StatusBadRequest, status, "Без фотографии ожидался статус 400")
 	require.Equal(t, "at least 1 photo is required", apiError.Message, "При запросе без фотографии сервер вернул неожиданное сообщение")
 }
+
+func TestCreateAdvertisementWithUnsupportedPhotoFormat(t *testing.T) {
+	base.SetupSuite()
+
+	t.Log("Подготовка: авторизуемся и выбираем текстовый файл вместо фотографии")
+	login := auth.Login(t, os.Getenv("TEST_LOGIN"), os.Getenv("TEST_PASSWORD"))
+
+	t.Log("Шаг: отправляем запрос с файлом неподдерживаемого формата")
+	status, apiError := advertisements.CreateAdvertisementWithCleanup(
+		t,
+		login.Token,
+		"Проверка формата фотографии",
+		"Объявление с некорректным файлом",
+		"100",
+		"1",
+		"invalid_photo.txt",
+	)
+
+	t.Logf("Результат: статус %d, сообщение: %s", status, apiError.Message)
+	require.Equal(t, http.StatusBadRequest, status, "Для текстового файла ожидался статус 400")
+	require.Equal(
+		t,
+		`photo 1: file type not allowed: extension ".txt"`,
+		apiError.Message,
+		"Сервер вернул неожиданное сообщение об ошибке формата файла",
+	)
+}
+
+func TestCreateAdvertisementWithFourPhotos(t *testing.T) {
+	base.SetupSuite()
+
+	t.Log("Подготовка: авторизуемся и готовим четыре фотографии")
+	login := auth.Login(t, os.Getenv("TEST_LOGIN"), os.Getenv("TEST_PASSWORD"))
+
+	t.Log("Шаг: отправляем объявление с четырьмя фотографиями")
+	status, apiError := advertisements.CreateAdvertisementWithCleanup(
+		t,
+		login.Token,
+		"Проверка количества фотографий",
+		"Объявление с четырьмя фотографиями",
+		"100",
+		"1",
+		testPhotoPath,
+		testPhotoPath,
+		testPhotoPath,
+		testPhotoPath,
+	)
+
+	t.Logf("Результат: статус %d, сообщение: %s", status, apiError.Message)
+	require.Equal(t, http.StatusBadRequest, status, "Для четырёх фотографий ожидался статус 400")
+	require.Equal(
+		t,
+		"maximum 3 photos allowed",
+		apiError.Message,
+		"Сервер вернул неожиданное сообщение об ошибке количества фотографий",
+	)
+}

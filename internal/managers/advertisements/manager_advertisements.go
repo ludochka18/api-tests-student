@@ -121,6 +121,7 @@ func CreateAdvertisementWithCleanup(
 	price string,
 	quantity string,
 	photoPath string,
+	extraPhotoPaths ...string,
 ) (int, models.ErrorResponse) {
 	t.Helper()
 
@@ -132,6 +133,7 @@ func CreateAdvertisementWithCleanup(
 		price,
 		quantity,
 		photoPath,
+		extraPhotoPaths...,
 	)
 	defer response.Body.Close()
 
