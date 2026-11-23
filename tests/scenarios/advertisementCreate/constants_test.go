@@ -1,3 +1,3 @@
 package advertisementCreate
 
-const testPhotoPath = "../../testdata/advertisement.jpg"
+const testPhotoPath = "advertisement.jpg"

@@ -47,7 +47,7 @@ func (s *TestSuite) TestGetMyAdvertisementsPositive() {
 	advertisement := advertisements.CreateAdvertisement(
 		t, s.loginData.Token, title,
 		"Объявление для проверки списка", "100", "1",
-		"../../testdata/advertisement.jpg",
+		"advertisement.jpg",
 	)
 	require.NotEmpty(t, advertisement.ID, "Сервер не вернул ID объявления")
 	t.Cleanup(func() {

@@ -62,7 +62,7 @@ func (s *TestSuite) SetupTest() {
 		"Объявление для проверки поиска",
 		"100",
 		"1",
-		"../../testdata/advertisement.jpg",
+		"advertisement.jpg",
 	)
 
 	require.NotEmpty(t, advertisement.ID, "Сервер не вернул ID объявления для поиска")
