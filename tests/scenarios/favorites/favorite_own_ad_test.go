@@ -25,8 +25,8 @@ func TestCannotAddOwnAdvertisementToFavorites(t *testing.T) {
 		owner.Token,
 		"Тест собственного объявления",
 		"Объявление для проверки избранного",
-		"100",
-		"1",
+		testPrice,
+		testQuantity,
 		testPhotoPath,
 	)
 	require.NotEmpty(t, advertisement.ID, "Сервер не вернул ID объявления")

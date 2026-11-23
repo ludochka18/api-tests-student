@@ -2,12 +2,10 @@ package favorites
 
 import (
 	"fmt"
-	"os"
 	"testing"
 	"time"
 
 	"api-tests-template/internal/managers/advertisements"
-	"api-tests-template/internal/managers/auth"
 	"api-tests-template/internal/managers/favorites"
 	base "api-tests-template/tests"
 
@@ -17,10 +15,7 @@ import (
 func TestFavoriteDisappearsAfterAdvertisementDeletion(t *testing.T) {
 	base.SetupSuite()
 
-	t.Log("Подготовка: авторизуем два аккаунта")
-	owner := auth.Login(t, os.Getenv("TEST_LOGIN"), os.Getenv("TEST_PASSWORD"))
-	user := auth.Login(t, os.Getenv("TEST_SECOND_LOGIN"), os.Getenv("TEST_SECOND_PASSWORD"))
-	require.NotEqual(t, owner.User.Id, user.User.Id, "Для теста нужны разные аккаунты")
+	owner, user := loginFavoriteUsers(t)
 
 	title := fmt.Sprintf("Удаление избранного %d", time.Now().UnixNano())
 
@@ -30,8 +25,8 @@ func TestFavoriteDisappearsAfterAdvertisementDeletion(t *testing.T) {
 		owner.Token,
 		title,
 		"Объявление для проверки удаления",
-		"100",
-		"1",
+		testPrice,
+		testQuantity,
 		testPhotoPath,
 	)
 	require.NotEmpty(t, advertisement.ID, "Сервер не вернул ID объявления")

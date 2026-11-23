@@ -2,11 +2,9 @@ package favorites
 
 import (
 	"net/http"
-	"os"
 	"testing"
 
 	"api-tests-template/internal/managers/advertisements"
-	"api-tests-template/internal/managers/auth"
 	"api-tests-template/internal/managers/favorites"
 	base "api-tests-template/tests"
 
@@ -16,10 +14,7 @@ import (
 func TestCannotAddFavoriteTwice(t *testing.T) {
 	base.SetupSuite()
 
-	t.Log("Подготовка: авторизуем два аккаунта")
-	owner := auth.Login(t, os.Getenv("TEST_LOGIN"), os.Getenv("TEST_PASSWORD"))
-	user := auth.Login(t, os.Getenv("TEST_SECOND_LOGIN"), os.Getenv("TEST_SECOND_PASSWORD"))
-	require.NotEqual(t, owner.User.Id, user.User.Id, "Для теста нужны разные аккаунты")
+	owner, user := loginFavoriteUsers(t)
 
 	t.Log("Подготовка: создаём объявление")
 	advertisement := advertisements.CreateAdvertisement(
@@ -27,8 +22,8 @@ func TestCannotAddFavoriteTwice(t *testing.T) {
 		owner.Token,
 		"Тест повторного добавления",
 		"Объявление для проверки избранного",
-		"100",
-		"1",
+		testPrice,
+		testQuantity,
 		testPhotoPath,
 	)
 	require.NotEmpty(t, advertisement.ID, "Сервер не вернул ID объявления")
